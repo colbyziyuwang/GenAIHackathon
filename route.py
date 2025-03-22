@@ -1,7 +1,7 @@
 import requests
 
 # Replace this with your real API key
-API_KEY = "8a8347bfc8b445e79cc782acf2fcf9c0"
+API_KEY = ""
 
 # Sample locations (Toronto Union Station to UofT Robarts Library)
 start_lat, start_lon = 43.6450, -79.3807  # Toronto Union Station
