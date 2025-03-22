@@ -45,7 +45,8 @@ ${userInput}
     // Try to parse the output as JSON
     let items = [];
     try {
-      items = JSON.parse(replyText);
+      const cleaned = replyText.trim().replace(/^```json\n?/i, '').replace(/```$/, '');
+      items = JSON.parse(cleaned);
     } catch (err) {
       console.error("⚠️ Failed to parse Gemini output as JSON:", replyText);
     }

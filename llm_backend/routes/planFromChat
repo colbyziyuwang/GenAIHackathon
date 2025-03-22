@@ -1,0 +1,36 @@
+const express = require('express');
+const router = express.Router();
+
+const { handleUserMessage } = require('../services/chatService');
+const { planPriorSteps } = require('../services/planService');
+
+router.post('/', async (req, res) => {
+  const { message } = req.body;
+
+  if (!message) {
+    return res.status(400).json({ error: 'Missing message in request body.' });
+  }
+
+  try {
+    // Step 1: Normalize input into structured items
+    const { items } = await handleUserMessage(message);
+
+    // Step 2: Plan subtasks for each item
+    const plans = [];
+    for (const item of items) {
+      const steps = await planPriorSteps(item);
+      plans.push({ item, steps });
+    }
+
+    // Step 3: Send response
+    res.json({
+      reply: `Planned ${plans.length} item(s).`,
+      plans
+    });
+  } catch (err) {
+    console.error('Pipeline error:', err);
+    res.status(500).json({ error: 'Pipeline failed to process message.' });
+  }
+});
+
+module.exports = router;
