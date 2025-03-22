@@ -1,1 +1,15 @@
 task/
+
+# Node.js dependencies
+node_modules/
+
+# Optional: environment variables
+.env
+
+# Logs
+*.log
+
+# Optional: macOS and editor-related files
+.DS_Store
+.idea/
+.vscode/
