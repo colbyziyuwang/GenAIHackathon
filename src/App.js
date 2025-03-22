@@ -9,7 +9,6 @@ import 'react-big-calendar/lib/css/react-big-calendar.css';
 import './App.css';
 
 const locales = { 'en-US': enUS };
-
 const localizer = dateFnsLocalizer({
   format,
   parse,
@@ -19,62 +18,96 @@ const localizer = dateFnsLocalizer({
 });
 
 function App() {
-  const [events] = useState([
-    {
-      title: 'Sample Event',
-      start: new Date(),
-      end: new Date(),
-    },
-  ]);
-
+  const [events, setEvents] = useState([]);
+  const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
-  const [response, setResponse] = useState('');
-  const [view, setView] = useState('month');
+  const [loading, setLoading] = useState(false);
 
-  const sendMessage = async () => {
+  const handleSubmit = async () => {
     if (!input.trim()) return;
+
+    const userMessage = { sender: 'user', text: input };
+    setMessages((prev) => [...prev, userMessage]);
+    setLoading(true);
 
     try {
       const res = await fetch('http://localhost:5000/auto-plan', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: input }),
       });
 
       const data = await res.json();
-      setResponse(data.result || JSON.stringify(data));
-    } catch (err) {
-      console.error('Error:', err);
-      setResponse('Error connecting to the server.');
+
+      // Add bot reply to messages
+      const botReply = data.reply || 'No response from auto plan!';
+      setMessages((prev) => [...prev, { sender: 'bot', text: botReply }]);
+
+      // Map plans to calendar events
+      const newEvents = [];
+
+      data.plans?.forEach((plan) => {
+        if (plan.item) {
+          newEvents.push({
+            title: plan.item.title,
+            start: new Date(plan.item.start_time),
+            end: new Date(plan.item.end_time),
+          });
+        }
+
+        plan.steps?.forEach((step) => {
+          newEvents.push({
+            title: `🔧 ${step.title}`,
+            start: new Date(step.due),
+            end: new Date(step.due),
+          });
+        });
+      });
+
+      setEvents((prev) => [...prev, ...newEvents]);
+    } catch (error) {
+      console.error('❌ API Error:', error);
+      setMessages((prev) => [
+        ...prev,
+        { sender: 'bot', text: '⚠️ Failed to reach planner service.' },
+      ]);
     }
 
     setInput('');
+    setLoading(false);
   };
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter') {
-      e.preventDefault();
-      sendMessage();
+      handleSubmit();
     }
   };
 
   return (
     <div className="App">
-      <h2>📅 Calendar + Auto-Planning</h2>
+      <h2>📅 AI Planner + Calendar</h2>
 
-      {/* View Switcher */}
-      <div className="view-buttons">
-        {['month', 'week', 'day', 'agenda'].map((v) => (
-          <button
-            key={v}
-            onClick={() => setView(v)}
-            className={view === v ? 'active' : ''}
-          >
-            {v.charAt(0).toUpperCase() + v.slice(1)}
+      <div className="chatbox">
+        <div className="messages">
+          {messages.map((msg, i) => (
+            <div key={i} className={`msg ${msg.sender}`}>
+              {msg.text}
+            </div>
+          ))}
+          {loading && <div className="msg bot">⏳ Planning...</div>}
+        </div>
+
+        <div className="input-area">
+          <input
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Describe your plan (e.g., 'Plan my workout tomorrow')"
+          />
+          <button onClick={handleSubmit} disabled={loading}>
+            Submit
           </button>
-        ))}
+        </div>
       </div>
 
       <Calendar
@@ -82,36 +115,10 @@ function App() {
         events={events}
         startAccessor="start"
         endAccessor="end"
-        view={view}
-        onView={setView}
-        style={{ height: '70vh', margin: '2rem 0' }}
+        views={['month', 'week', 'day', 'agenda']}
+        defaultView="month"
+        style={{ height: '80vh', marginTop: '2rem' }}
       />
-
-      {/* Input */}
-      <div className="input-area">
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              e.preventDefault(); // ⛔ Prevents form submit or page reload
-              sendMessage();      // ✅ Trigger message sending
-            }
-          }}
-          placeholder="Type your message..."
-        />
-        <button onClick={sendMessage}>Send</button>
-      </div>
- 
-
-      {/* Response */}
-      {response && (
-        <div className="response-box">
-          <h4>🧠 AutoPlan Response:</h4>
-          <pre>{response}</pre>
-        </div>
-      )}
     </div>
   );
 }
