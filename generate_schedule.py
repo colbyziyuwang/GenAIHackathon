@@ -1,7 +1,8 @@
 import requests
 import csv
+from LLM import *
 
-def generate_schedule_with_llama(subtasks, output_file="schedule.csv"):
+def generate_schedule(subtasks, output_file="schedule.csv"):
     # Join all subtasks into a single prompt
     joined_subtasks = "\n".join([f"- {s}" for s in subtasks])
 
@@ -20,23 +21,11 @@ Time,Task
 ...
 """
 
-    # Call Ollama LLaMA 3.2 model
-    response = requests.post(
-        "http://localhost:11434/api/generate",
-        json={
-            "model": "llama3.2",
-            "prompt": prompt,
-            "stream": False
-        }
-    )
-
-    if response.status_code != 200:
-        raise Exception(f"Failed to generate schedule: {response.text}")
-
-    raw_text = response.json()["response"].strip()
+    # Call an LLM model
+    response = get_llm_response(prompt).strip()
 
     # Parse lines into CSV rows
-    lines = raw_text.split("\n")
+    lines = response.split("\n")
     schedule_rows = []
 
     for line in lines:
@@ -52,6 +41,9 @@ Time,Task
 
     print(f"✅ Schedule written to {output_file}")
 
+    # Return the file
+    return output_file
+
 
 # Example usage
 if __name__ == "__main__":
@@ -64,5 +56,5 @@ if __name__ == "__main__":
         "Research for presentation"
     ]
 
-    generate_schedule_with_llama(example_subtasks)
+    generate_schedule(example_subtasks)
 
