@@ -1,3 +1,5 @@
+const express = require('express');
+const router = express.Router();
 const { handleUserMessage } = require('../services/chatService');
 
 router.post('/', async (req, res) => {
@@ -15,3 +17,5 @@ router.post('/', async (req, res) => {
     res.status(500).json({ error: 'LLM failed to respond.' });
   }
 });
+
+module.exports = router;
