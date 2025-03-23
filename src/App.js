@@ -110,18 +110,6 @@ function App() {
           </button>
         </div>
       </div>
-      
-      <div className="custom-toolbar">
-        {['month', 'week', 'day', 'agenda'].map((v) => (
-          <button
-            key={v}
-            onClick={() => setView(v)}
-            className={v === view ? 'active' : ''}
-          >
-            {v.charAt(0).toUpperCase() + v.slice(1)}
-          </button>
-        ))}
-      </div>
 
       <Calendar
         localizer={localizer}
