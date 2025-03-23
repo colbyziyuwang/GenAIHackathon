@@ -3,13 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "proxy": "http://localhost:5000",
-
   "dependencies": {
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.2.0",
     "@testing-library/user-event": "^13.5.0",
     "date-fns": "^4.1.0",
+    "pretty-format": "^29.7.0",
     "react": "^19.0.0",
     "react-big-calendar": "^1.18.0",
     "react-calendar": "^5.1.0",
