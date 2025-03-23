@@ -4,6 +4,8 @@ async function handleUserMessage(userInput) {
   // Combine instructions + user message into a single user prompt
   const fullPrompt = `
 You are a helpful assistant that normalizes scheduling input.
+Unless specified otherwise, assume that all times mentioned by the user are in their **local timezone**.
+For example, "2 PM" means 2 PM local time (not UTC).
 
 Each line is either an event or a task:
 - Events always include a start and end time.
@@ -14,13 +16,13 @@ Your job is to return a structured JSON array of objects like this:
   {
     "type": "event",
     "title": "Team Meeting",
-    "start_time": "2025-03-23T14:00:00Z",
-    "end_time": "2025-03-23T15:00:00Z"
+    "start_time": "2025-03-23T14:00:00",
+    "end_time": "2025-03-23T15:00:00"
   },
   {
     "type": "task",
     "title": "Submit report",
-    "deadline": "2025-03-24T23:59:00Z"
+    "deadline": "2025-03-24T23:59:00"
   }
 ]
 
