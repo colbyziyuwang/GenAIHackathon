@@ -94,3 +94,13 @@ h2 {
   box-shadow: 0 2px 10px rgba(0,0,0,0.05);
   padding: 1rem;
 }
+
+.rbc-event {
+  background-color: #007bff;
+}
+.rbc-event-main {
+  background-color: #28a745;
+}
+.rbc-event-subtask {
+  background-color: #ffc107;
+}

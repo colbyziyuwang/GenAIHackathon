@@ -22,8 +22,6 @@ function App() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
-  const [view, setView] = useState('month');
-  const [date, setDate] = useState(new Date());
 
   // State for calendar view and date
   const [currentView, setCurrentView] = useState('month');
@@ -47,7 +45,7 @@ function App() {
 
       const botReply = data.reply || 'No response from auto plan!';
       setMessages((prev) => [...prev, { sender: 'bot', text: botReply }]);
-
+      
       const newEvents = [];
 
       data.plans?.forEach((plan) => {
@@ -56,6 +54,7 @@ function App() {
             title: plan.item.title,
             start: new Date(plan.item.start_time),
             end: new Date(plan.item.end_time),
+            type: 'main',
           });
         }
 
@@ -64,6 +63,7 @@ function App() {
             title: `🔧 ${step.title}`,
             start: new Date(step.due),
             end: new Date(step.due),
+            type: 'subtask',
           });
         });
       });
@@ -133,7 +133,12 @@ function App() {
         onView={handleViewChange}
         date={currentDate}
         onNavigate={handleNavigate}
+        onSelectEvent={(event) => alert(`Event: ${event.title}`)}
         style={{ height: '80vh', marginTop: '2rem' }}
+        eventPropGetter={(event) => {
+          let bg = event.type === 'subtask' ? '#ffc107' : '#28a745';
+          return { style: { backgroundColor: bg } };
+        }}        
       />
     </div>
   );
