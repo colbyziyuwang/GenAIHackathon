@@ -43,7 +43,7 @@ const functionDeclarations = [
   {
     functionDeclarations: [
       {
-        name: "create_event",
+        name: "createEvent",
         description: "create a new event in the calendar for the user",
         parameters: {
           type: FunctionDeclarationSchemaType.OBJECT,
@@ -58,7 +58,7 @@ const functionDeclarations = [
         },
       },
       {
-        name: "update_event",
+        name: "updateEvent",
         description: "update an existing event in the calendar for the user",
         parameters: {
           type: FunctionDeclarationSchemaType.OBJECT,
@@ -74,7 +74,7 @@ const functionDeclarations = [
         },
       },
       {
-        name: "delete_event",
+        name: "deleteEvent",
         description: "delete an existing event in the calendar for the user",
         parameters: {
           type: FunctionDeclarationSchemaType.OBJECT,
