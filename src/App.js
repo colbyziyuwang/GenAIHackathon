@@ -22,6 +22,8 @@ function App() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [view, setView] = useState('month');
+  const [date, setDate] = useState(new Date());
 
   // State for calendar view and date
   const [currentView, setCurrentView] = useState('month');
