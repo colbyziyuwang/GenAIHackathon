@@ -8,6 +8,9 @@ const planFromChatRoute = require('./routes/planFromChat');
 const understandRoute = require('./routes/understand');
 const autoPlanRoute = require('./routes/autoPlan');
 
+// for interactive planner
+const iPlanRoute = require('./iplan/iplan');
+
 const app = express();
 const port = 5000;
 
@@ -19,7 +22,7 @@ app.use('/plan', planRoute);
 app.use('/plan-from-chat', planFromChatRoute);
 app.use('/understand', understandRoute);
 app.use('/auto-plan', autoPlanRoute);
-
+app.use('/iplan', iPlanRoute);
 
 app.listen(port, () => {
   console.log(`🚀 LLM Backend running at http://localhost:${port}`);

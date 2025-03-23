@@ -19,6 +19,7 @@ const localizer = dateFnsLocalizer({
 
 function App() {
   const [events, setEvents] = useState([]);
+  const [prevEventId, setPrevEventId] = useState(0);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -29,46 +30,100 @@ function App() {
   const [currentView, setCurrentView] = useState('month');
   const [currentDate, setCurrentDate] = useState(new Date());
 
-  const handleSubmit = async () => {
-    if (!input.trim()) return;
+  const raw_events = events.map((event) => {
+    return {
+      title: event.title,
+      start: event.startTime,
+      end: event.endTime,
+    };
+  });
+  console.log("raw_events: ", raw_events);
+  console.log("events: ", events);
 
-    const userMessage = { sender: 'user', text: input };
+  // TODO: DOES NOT UPDATE THE CALENDAR VIEW PROPERLY
+  const createEvent = (args) => { 
+    const newEvent = {
+      eventId: prevEventId,
+      title: args.title,
+      description: args.description,
+      startTime: new Date(args.startTime),
+      endTime: new Date(args.endTime),
+    };
+    setPrevEventId(prevEventId + 1);
+    setEvents((prev) => [...prev, newEvent]);
+  };
+
+  const modifyEvent = (args) => {
+    const { eventId } = args;
+    const newEvents = events.map((event) => {
+      if (event.eventId === eventId) {
+        return {
+          ...event,
+          title: args.title,
+          description: args.description,
+          startTime: new Date(args.startTime),
+          endTime: new Date(args.endTime),
+        };
+      }
+      return event;
+    });
+    setEvents(newEvents);
+  }
+
+  const deleteEvent = (args) => {
+    const { eventId } = args;
+    const newEvents = events.filter((event) => event.eventId !== eventId);
+    setEvents(newEvents);
+  }
+
+  const handleSubmit = async () => {
+    if (!input.trim())
+      return;
+
+    const savedInput = input;
+    setInput('');
+
+    const userMessage = { sender: 'user', text: savedInput };
     setMessages((prev) => [...prev, userMessage]);
     setLoading(true);
+    
 
     try {
-      const res = await fetch('http://localhost:5000/auto-plan', {
+      const res = await fetch('http://localhost:5000/iplan', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: input }),
+        body: JSON.stringify({
+          calendar: events,
+          message: savedInput
+        }),
       });
 
       const data = await res.json();
+      console.log("data: ", JSON.stringify(data, null, 2));
 
-      const botReply = data.reply || 'No response from auto plan!';
-      setMessages((prev) => [...prev, { sender: 'bot', text: botReply }]);
+      // display reply from LLM
+      const mReply = data.mReply;
+      if (mReply)
+        setMessages((prev) => [...prev, { sender: 'bot', text: mReply }]);
 
-      const newEvents = [];
-
-      data.plans?.forEach((plan) => {
-        if (plan.item) {
-          newEvents.push({
-            title: plan.item.title,
-            start: new Date(plan.item.start_time),
-            end: new Date(plan.item.end_time),
-          });
+      // call the function if LLM wants to
+      const mMethodToCall = data.mMethodToCall;
+      if (mMethodToCall) {
+        switch (mMethodToCall.name) {
+          case "createEvent":
+            createEvent(mMethodToCall.args);
+            break;
+          case "modifyEvent":
+            modifyEvent(mMethodToCall.args);
+            break;
+          case "deleteEvent":
+            deleteEvent(mMethodToCall.args);
+            break;
+          default:
+            break;
         }
-
-        plan.steps?.forEach((step) => {
-          newEvents.push({
-            title: `🔧 ${step.title}`,
-            start: new Date(step.due),
-            end: new Date(step.due),
-          });
-        });
-      });
-
-      setEvents((prev) => [...prev, ...newEvents]);
+      }
+    
     } catch (error) {
       console.error('❌ API Error:', error);
       setMessages((prev) => [
@@ -77,7 +132,58 @@ function App() {
       ]);
     }
 
-    setInput('');
+  // const handleSubmit = async () => {
+  //   if (!input.trim()) return;
+
+  //   const userMessage = { sender: 'user', text: input };
+  //   setMessages((prev) => [...prev, userMessage]);
+  //   setLoading(true);
+  //   setInput('');
+
+  //   try {
+  //     const res = await fetch('http://localhost:5000/auto-plan', {
+  //       method: 'POST',
+  //       headers: { 'Content-Type': 'application/json' },
+  //       body: JSON.stringify({ message: input }),
+  //     });
+
+  //     const data = await res.json();
+
+  //     // Add bot reply to messages
+  //     const botReply = data.reply || 'No response from auto plan!';
+  //     setMessages((prev) => [...prev, { sender: 'bot', text: botReply }]);
+
+  //     // Map plans to calendar events
+  //     const newEvents = [];
+
+  //     data.plans?.forEach((plan) => {
+  //       if (plan.item) {
+  //         newEvents.push({
+  //           title: plan.item.title,
+  //           start: new Date(plan.item.start_time),
+  //           end: new Date(plan.item.end_time),
+  //         });
+  //       }
+
+  //       plan.steps?.forEach((step) => {
+  //         newEvents.push({
+  //           title: `🔧 ${step.title}`,
+  //           start: new Date(step.due),
+  //           end: new Date(step.due),
+  //         });
+  //       });
+  //     });
+
+  //     setEvents((prev) => [...prev, ...newEvents]);
+  //   } catch (error) {
+  //     console.error('❌ API Error:', error);
+  //     setMessages((prev) => [
+  //       ...prev,
+  //       { sender: 'bot', text: '⚠️ Failed to reach planner service.' },
+  //     ]);
+  //   }
+
+    // setInput('');
     setLoading(false);
   };
 
@@ -125,7 +231,7 @@ function App() {
 
       <Calendar
         localizer={localizer}
-        events={events}
+        events={raw_events}
         startAccessor="start"
         endAccessor="end"
         views={['month', 'week', 'day', 'agenda']}

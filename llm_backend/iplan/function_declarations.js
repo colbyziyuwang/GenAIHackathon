@@ -21,12 +21,12 @@ const functionDeclarations = [{
             startTime: {
               type: FunctionDeclarationSchemaType.STRING,
               "description":
-                "starting time of the event"
+                "starting time of the event in ISO 8601 format"
             },
             endTime: {
               type: FunctionDeclarationSchemaType.STRING,
               "description":
-                "ending time of the event"
+                "ending time of the event in ISO 8601 format"
             }
         },
         required: ["title", "description", "startTime", "endTime"]
@@ -57,12 +57,12 @@ const functionDeclarations = [{
           startTime: {
             type: FunctionDeclarationSchemaType.STRING,
             "description":
-              "updated starting time of the event"
+              "updated starting time of the event in ISO 8601 format"
           },
           endTime: {
             type: FunctionDeclarationSchemaType.STRING,
             "description":
-              "updated ending time of the event"
+              "updated ending time of the event in ISO 8601 format"
           }
         }
       }
@@ -82,11 +82,6 @@ const functionDeclarations = [{
         }
       }
     },
-
-    {
-      name: "expandEvent",
-      description: ""
-    }
   ]
 }];
 
