@@ -23,6 +23,10 @@ function App() {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
 
+  // State for calendar view and date
+  const [currentView, setCurrentView] = useState('month');
+  const [currentDate, setCurrentDate] = useState(new Date());
+
   const handleSubmit = async () => {
     if (!input.trim()) return;
 
@@ -39,11 +43,9 @@ function App() {
 
       const data = await res.json();
 
-      // Add bot reply to messages
       const botReply = data.reply || 'No response from auto plan!';
       setMessages((prev) => [...prev, { sender: 'bot', text: botReply }]);
 
-      // Map plans to calendar events
       const newEvents = [];
 
       data.plans?.forEach((plan) => {
@@ -83,6 +85,15 @@ function App() {
     }
   };
 
+  // Handlers for calendar view and navigation
+  const handleViewChange = (view) => {
+    setCurrentView(view);
+  };
+
+  const handleNavigate = (date) => {
+    setCurrentDate(date);
+  };
+
   return (
     <div className="App">
       <h2>📅 AI Planner + Calendar</h2>
@@ -116,7 +127,10 @@ function App() {
         startAccessor="start"
         endAccessor="end"
         views={['month', 'week', 'day', 'agenda']}
-        defaultView="month"
+        view={currentView}
+        onView={handleViewChange}
+        date={currentDate}
+        onNavigate={handleNavigate}
         style={{ height: '80vh', marginTop: '2rem' }}
       />
     </div>
