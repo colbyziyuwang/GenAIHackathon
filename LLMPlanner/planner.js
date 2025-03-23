@@ -102,7 +102,7 @@ const updateEvent = (args) => {
   console.log("Updating event with args: ", args);
 }
 
-const DeleteEvent = (args) => {
+const deleteEvent = (args) => {
   /**
    * Delete an existing event in the calendar for the user.
    */
