@@ -8,10 +8,10 @@ async function planPriorSteps(item) {
 You are a task planning assistant. The user has a task: "${item.title}" which is due by ${item.deadline}.
 Break this task into 2 to 3 smaller steps that should be completed before the deadline.
 
-Each subtask should:
+Each step should:
 - Have a clear title.
-- Be scheduled **between 9:00 AM and 9:00 PM** local time.
-- Be logically placed based on the final deadline or event start time.
+- Be scheduled between 9:00 AM and 9:00 PM local time.
+- Be logically placed based on the deadline.
 
 Return the steps as a JSON array like:
 [
@@ -25,10 +25,10 @@ You are a task planning assistant. The user has an event: "${item.title}" starti
 Suggest 2 to 3 preparation steps the user should do **before** the event begins.
 Each step should have a title and a due time before the event.
 
-Each subtask should:
+Each step should:
 - Have a clear title.
 - Be scheduled **between 9:00 AM and 9:00 PM** local time.
-- Be logically placed based on the final deadline or event start time.
+- Be logically placed based on the event start time.
 
 Return the steps as a JSON array like:
 [
