@@ -23,6 +23,7 @@ function App() {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [view, setView] = useState('month');
+  const [date, setDate] = useState(new Date());
 
   const handleSubmit = async () => {
     if (!input.trim()) return;
@@ -119,6 +120,8 @@ function App() {
         views={['month', 'week', 'day', 'agenda']}
         view={view}
         onView={setView}
+        date={date}
+        onNavigate={(newDate) => setDate(newDate)}
         style={{ height: '80vh', marginTop: '2rem' }}
       />
     </div>
