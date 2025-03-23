@@ -22,6 +22,7 @@ function App() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [view, setView] = useState('month');
 
   const handleSubmit = async () => {
     if (!input.trim()) return;
@@ -109,6 +110,18 @@ function App() {
           </button>
         </div>
       </div>
+      
+      <div className="custom-toolbar">
+        {['month', 'week', 'day', 'agenda'].map((v) => (
+          <button
+            key={v}
+            onClick={() => setView(v)}
+            className={v === view ? 'active' : ''}
+          >
+            {v.charAt(0).toUpperCase() + v.slice(1)}
+          </button>
+        ))}
+      </div>
 
       <Calendar
         localizer={localizer}
@@ -116,7 +129,8 @@ function App() {
         startAccessor="start"
         endAccessor="end"
         views={['month', 'week', 'day', 'agenda']}
-        defaultView="month"
+        view={view}
+        onView={setView}
         style={{ height: '80vh', marginTop: '2rem' }}
       />
     </div>
